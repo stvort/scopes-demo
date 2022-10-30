@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Индикатор настроения</title>
+    <style>
+        body {
+            font-size: 16pt;
+        }
+
+        h3 {
+            color: CornflowerBlue;
+        }
+
+    </style>
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
+    <script th:inline="javascript">
+        var moodLevel = [[${moodLevel}]];
+
+        $( function() {
+            const progressbar = $( "#progressbar" )
+            setProgressBarLevel(progressbar, moodLevel)
+        })
+
+        function calcProgressBarColorByLevel(level){
+            let color = '#B22222'
+            if (level >= 25 && level < 50) {
+                color = '#FFA500'
+            } else if (level >= 50 && level < 75) {
+                color = '#FFD700'
+            } else if (!level || level > 75) {
+                color = '#00FF7F'
+            }
+            return color;
+        }
+
+        function setProgressBarColor(progressbar, color){
+            progressbarValue = progressbar.find( ".ui-progressbar-value" )
+            progressbarValue.css({"background": color})
+        }
+
+        function setProgressBarLevel(progressbar, level){
+            moodLevel = (moodLevel < 100)? moodLevel: false
+            progressbar.progressbar({value: moodLevel})
+            const moodColor = calcProgressBarColorByLevel(moodLevel)
+            setProgressBarColor(progressbar, moodColor)
+        }
+    </script>
+</head>
+<body>
+<div style="margin-left: auto; margin-right: auto; width: 510px">
+    <h3>Выбор песни</h3>
+    <form th:action="@{/mood}" th:method="POST">
+        <select th:name="song" style="width: 500px; height: 100px; display: block" multiple>
+            <option th:each="song: ${songs}"
+                    th:value="${song}"
+                    th:text="${song}">
+                Песня
+            </option>
+        </select>
+        <button type="submit" formtarget="_self">Спеть песню, чтобы поднять настроение</button>
+    </form>
+    <hr/>
+    <h3>Индикатор настроения</h3>
+    <div id="progressbarWrapper" style="width: 500px">
+        <div id="progressbar"></div>
+    </div>
+</div>
+</body>
+</html>
